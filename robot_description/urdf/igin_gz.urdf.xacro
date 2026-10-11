@@ -1,0 +1,173 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+
+    <gazebo reference="front_caster_wheel_link">
+        <mu1 value="0.1"/>
+        <mu2 value="0.1"/>
+    </gazebo>
+
+    <gazebo reference="back_caster_wheel_link">
+        <mu1 value="0.1"/>
+        <mu2 value="0.1"/>
+    </gazebo>
+
+    <gazebo reference="base_laser">
+        <sensor name="lidar_sensor" type="gpu_lidar">
+            <gz_frame_id>base_laser</gz_frame_id>
+            <pose relative_to="base_laser">0 0 0 0 0 0</pose>
+            <topic>scan</topic>
+            <update_rate>10</update_rate>
+            <ray>
+                <scan>
+                    <horizontal>
+                        <samples>640</samples>
+                        <resolution>1</resolution>
+                        <min_angle>-1.57</min_angle>   <!-- full 360° -->
+                        <max_angle>1.57</max_angle>
+                    </horizontal>
+                    <vertical>
+                        <samples>1</samples>
+                        <resolution>0.01</resolution>
+                        <min_angle>0</min_angle>   <!-- full 360° -->
+                        <max_angle>0</max_angle>
+                    </vertical>
+                </scan>
+                <range>
+                    <min>0.12</min>                     <!-- min distance -->
+                    <max>12.0</max>                     <!-- max distance -->
+                    <resolution>0.01</resolution>
+                </range>
+            </ray>
+            <always_on>1</always_on>
+            <visualize>true</visualize>       
+        <!-- Sensor gpu_lidar -->
+        </sensor>
+    </gazebo>
+
+    <!-- the right sensor   -->
+    <gazebo reference="ultra4_link">
+        <sensor name="ultra4_sonic_sensor" type="gpu_lidar">
+          <gz_frame_id>ultra4_link</gz_frame_id>
+            <pose relative_to="ultra4_link">0 0 0 0 0 0</pose>
+            <topic>ultra4_link_scan</topic>
+            <update_rate>10</update_rate>
+            <ray>
+                <scan>
+                    <horizontal>
+                        <samples>15</samples>
+                        <resolution>1</resolution>
+                        <min_angle>-0.13</min_angle>
+                        <max_angle>0.13</max_angle>
+                    </horizontal>
+                    <vertical>
+                        <samples>1</samples>
+                        <resolution>0.01</resolution>
+                        <min_angle>0</min_angle>
+                        <max_angle>0</max_angle>
+                    </vertical>
+                </scan>
+                <range>
+                    <min>0.12</min>                     <!-- min distance -->
+                    <max>4.0</max>                     <!-- max distance -->
+                    <resolution>0.01</resolution>
+                </range>
+            </ray>
+            <always_on>1</always_on>
+            <visualize>true</visualize>           
+        <!-- Sensor gpu_lidar -->
+        </sensor>
+    </gazebo>
+
+    <!-- the left sensor   -->
+    <gazebo reference="ultra1_link">
+        <sensor name="ultra1_sonic_sensor" type="gpu_lidar">
+          <gz_frame_id>ultra1_link</gz_frame_id>
+            <pose relative_to="ultra1_link">0 0 0 0 0 0</pose>
+            <topic>ultra1_link_scan</topic>
+            <update_rate>10</update_rate>
+            <ray>
+                <scan>
+                    <horizontal>
+                        <samples>15</samples>
+                        <resolution>1</resolution>
+                        <min_angle>-0.13</min_angle>
+                        <max_angle>0.13</max_angle>
+                    </horizontal>
+                    <vertical>
+                        <samples>1</samples>
+                        <resolution>0.01</resolution>
+                        <min_angle>0</min_angle>
+                        <max_angle>0</max_angle>
+                    </vertical>
+                </scan>
+                <range>
+                    <min>0.12</min>                     <!-- min distance -->
+                    <max>4.0</max>                     <!-- max distance -->
+                    <resolution>0.01</resolution>
+                </range>
+            </ray>
+            <always_on>1</always_on>
+            <visualize>true</visualize>       
+        <!-- Sensor gpu_lidar -->
+        </sensor>
+    </gazebo>
+
+    <gazebo reference="proximity_sensor">
+        <sensor name="proximity_sensor" type="gpu_lidar">
+          <gz_frame_id>proximity_sensor</gz_frame_id>
+            <pose relative_to="proximity_sensor">0 0 0 0 0 0</pose>
+            <topic>proximity_sensor/scan</topic>
+            <update_rate>10</update_rate>
+            <ray>
+                <scan>
+                    <horizontal>
+                        <samples>1</samples>
+                        <resolution>1</resolution>
+                        <min_angle>0</min_angle>
+                        <max_angle>0</max_angle>
+                    </horizontal>
+                    <vertical>
+                        <samples>1</samples>
+                        <resolution>0.01</resolution>
+                        <min_angle>0</min_angle>
+                        <max_angle>0</max_angle>
+                    </vertical>
+                </scan>
+                <range>
+                    <min>0.00012</min>                     <!-- min distance -->
+                    <max>4.0</max>                     <!-- max distance -->
+                    <resolution>0.01</resolution>
+                </range>
+            </ray>
+            <always_on>1</always_on>
+            <visualize>true</visualize>           
+        <!-- Sensor gpu_lidar -->
+        </sensor>
+    </gazebo>
+
+
+
+    <gazebo>
+        <plugin 
+            filename="libignition-gazebo-sensors-system.so"
+            name="ignition::gazebo::systems::Sensors" >
+            <render_engine>ogre2</render_engine>
+        </plugin>
+    </gazebo>
+
+
+     <gazebo>
+        <plugin filename="gz_ros2_control-system" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
+            <parameters>$(find robot_bringup)/config/my_robot_controllers_sim.yaml</parameters>
+            <robot_param>robot_description</robot_param>
+            <robot_param_node>robot_state_publisher</robot_param_node>
+            <ros>
+                <remapping>/controller_manager/robot_description:=/robot_description</remapping>
+                <remapping>/diff_drive_controller/cmd_vel_unstamped:=/cmd_vel</remapping>
+                <!-- <remapping>/diff_drive_controller/cmd_vel:=/cmd_vel</remapping> -->
+                <remapping>/diff_drive_controller/odom:=/odom</remapping>
+            </ros>
+        </plugin>
+    </gazebo>
+</robot>

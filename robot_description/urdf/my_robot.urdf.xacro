@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="logic_robot">
+    
+    <xacro:include filename="common_prob.urdf.xacro"/>
+    <xacro:include filename="chassis.urdf.xacro"/>
+    <xacro:include filename="wheels_mobile_robot.urdf.xacro"/>
+    <xacro:include filename="sensors.urdf.xacro"/>
+    <xacro:include filename="igin_gz.urdf.xacro" />
+    <xacro:include filename="ros2_control.urdf.xacro" />
+    
+</robot>

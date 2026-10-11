@@ -1,0 +1,15 @@
+controller_manager:
+  ros__parameters:
+    update_rate: 200
+
+imu_broadcaster:
+  type: imu_sensor_broadcaster/IMUSensorBroadcaster
+
+
+imu_broadcaster:
+  ros__parameters:
+    sensor_name: imu_link     # must match URDF
+    frame_id: base_link         # or imu_link
+
+
+

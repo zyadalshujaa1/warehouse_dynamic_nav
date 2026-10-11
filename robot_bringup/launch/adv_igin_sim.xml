@@ -1,0 +1,83 @@
+<?xml version="1.0"?>
+<launch>
+
+    <set_parameter name="use_sim_time" value="true"/>
+
+    <let name="urdf_path"
+         value="$(find-pkg-share robot_description)/urdf/my_robot.urdf.xacro"/>
+
+    <let name="bridge_path"
+         value="$(find-pkg-share robot_bringup)/config/bridge_config.yaml"/>
+
+    <let name="world_path"
+         value="$(find-pkg-share robot_bringup)/world/Warehouse/warehouse.sdf"/>
+
+     <let name="world_empty_path"
+         value="$(find-pkg-share robot_bringup)/world/empty.sdf"/>
+
+    <arg name="use_sim_time" default="true"/>
+
+    <!-- <let name="world_path"
+         value="$(find-pkg-share robot_bringup)/world/Warehouse/warehouse.sdf"/>
+    
+    <let name="world_obs_path"
+         value="$(find-pkg-share robot_bringup)/world/warehouse_obs_world.sdf"/>-->
+
+    <arg name="map"
+    default="$(find-pkg-share robot_bringup)/maps/warehouse.yaml"/>
+
+    <arg name="nav2_config"
+        default="$(find-pkg-share robot_bringup)/config/nav2_param.yaml"/>
+
+
+    <node pkg="robot_state_publisher" exec="robot_state_publisher">
+        <param  name="robot_description" value="$(command 'xacro $(var urdf_path) ')" />
+        <param name="use_sim_time" value="true"/>
+    </node>
+
+    <include  file="$(find-pkg-share ros_gz_sim)/launch/gz_sim.launch.py">
+        <!-- <arg name="gz_args" value="$(var world_path) -r" /> -->
+        <!-- <arg name="gz_args" value="empty.sdf -r" /> -->
+        <arg name="gz_args" value="$(var world_empty_path) -r" />
+    </include>
+
+    <!-- -x -3.0 -y 0.0 -z 0.05 -Y 0.0 -->
+    <node pkg="ros_gz_sim" exec="create" args="-topic robot_description"/>
+
+    <node pkg="ros_gz_bridge" exec="parameter_bridge">
+        <param name="config_file" value="$(var bridge_path)"/>
+    </node>
+
+    <node pkg="controller_manager" exec="spawner" args="joint_state_broadcaster"/>
+    <node pkg="controller_manager" exec="spawner" args="diff_drive_controller"/>
+    <node pkg="controller_manager" exec="spawner" args="Nema_controller"/>
+    
+
+
+    <!-- <timer period="5.0">
+        <include file="$(find-pkg-share nav2_bringup)/launch/bringup_launch.py">
+
+            <arg name="slam" value="False"/>
+
+            <arg name="map" value="$(var map)"/>
+            <arg name="params_file" value="$(var nav2_config)"/>
+            <arg name="use_sim_time" value="$(var use_sim_time)"/>
+            <arg name="autostart" value="true"/>
+
+            <arg name="use_composition" value="False"/>
+            <arg name="use_respawn" value="False"/>
+            <arg name="log_level" value="info"/>
+
+        </include>
+    </timer> -->
+
+    <node pkg="adv_controller" exec="adv_getin_controller"/>
+    <!-- <node pkg="adv_controller" exec="nav2_clint"/>
+    <node pkg="adv_controller" exec="orgnizer"/> -->
+
+    
+    <!-- <node pkg="rviz2" exec="rviz2" output="screen"
+        args="-d $(find-pkg-share robot_description)/rviz2/rviz.rviz">
+    </node> -->
+
+</launch>

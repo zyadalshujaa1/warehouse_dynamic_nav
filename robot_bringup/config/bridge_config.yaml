@@ -1,0 +1,34 @@
+- ros_topic_name: "/clock"
+  gz_topic_name:  "/clock"
+  ros_type_name:  "rosgraph_msgs/msg/Clock" # you will need to search tp find the type
+  gz_type_name:   "ignition.msgs.Clock"    # ign topic -i -t /clock, in modern us gz instead of ign
+  direction:  GZ_TO_ROS  #also you have ROS_TO_GZ  and BIDIRECTIONAL
+
+
+- ros_topic_name: "/scan"
+  gz_topic_name:  "/scan"
+  ros_type_name:  "sensor_msgs/msg/LaserScan" # you will need to search tp find the type
+  gz_type_name:   "ignition.msgs.LaserScan"    # ign topic -i -t /clock, in modern us gz instead of ign
+  direction:  GZ_TO_ROS  #also you have ROS_TO_GZ  and BIDIRECTIONAL
+
+
+- ros_topic_name: "/ultra4_link_scan"
+  gz_topic_name:  "/ultra4_link_scan"
+  ros_type_name:  "sensor_msgs/msg/LaserScan" # you will need to search tp find the type
+  gz_type_name:   "ignition.msgs.LaserScan"    # ign topic -i -t /clock, in modern us gz instead of ign
+  direction:  GZ_TO_ROS  #also you have ROS_TO_GZ  and BIDIRECTIONAL
+
+
+- ros_topic_name: "/ultra1_link_scan"
+  gz_topic_name:  "/ultra1_link_scan"
+  ros_type_name:  "sensor_msgs/msg/LaserScan" # you will need to search tp find the type
+  gz_type_name:   "ignition.msgs.LaserScan"    # ign topic -i -t /clock, in modern us gz instead of ign
+  direction:  GZ_TO_ROS  #also you have ROS_TO_GZ  and BIDIRECTIONAL
+
+- ros_topic_name: "/proximity_sensor/scan"
+  gz_topic_name:  "/proximity_sensor/scan"
+  ros_type_name:  "sensor_msgs/msg/LaserScan" # you will need to search tp find the type
+  gz_type_name:   "ignition.msgs.LaserScan"    # ign topic -i -t /clock, in modern us gz instead of ign
+  direction:  GZ_TO_ROS  #also you have ROS_TO_GZ  and BIDIRECTIONAL
+
+  # this will be repetaed for every topic you want to connect between the gz sim and the ros topic 
