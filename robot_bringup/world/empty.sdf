@@ -16,7 +16,7 @@
     </plugin> -->
 
     <include>
-      <uri>file:///home/mary/logistic_ws/src/robot_bringup/world/my_lift_shelf/model.sdf</uri>
+      <uri>model://my_lift_shelf</uri>
       <name>logistics_shelf</name>
       <pose>1.0 -0.45 0.0 0 0 0</pose>
     </include>

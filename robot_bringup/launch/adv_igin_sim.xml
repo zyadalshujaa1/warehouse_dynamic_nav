@@ -2,6 +2,7 @@
 <launch>
 
     <set_parameter name="use_sim_time" value="true"/>
+    <set_env name="IGN_GAZEBO_RESOURCE_PATH" value="$(find-pkg-share robot_bringup)/world:$(find-pkg-share robot_description)/.."/>
 
     <let name="urdf_path"
          value="$(find-pkg-share robot_description)/urdf/my_robot.urdf.xacro"/>
