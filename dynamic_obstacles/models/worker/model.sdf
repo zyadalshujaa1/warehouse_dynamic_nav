@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<!--
+  A warehouse worker represented as a cylinder (radius 0.25 m, height 1.7 m).
+  - Gravity is off and the body floats 1 cm above the floor, so there is no
+    friction and the motion is exactly the commanded velocity.
+  - VelocityControl lets us move it by publishing a Twist on
+    /model/<name>/cmd_vel (sent from ROS through ros_gz_bridge).
+-->
+<sdf version="1.8">
+  <model name="worker">
+    <static>false</static>
+    <link name="body">
+      <pose>0 0 0.86 0 0 0</pose>
+      <gravity>false</gravity>
+      <inertial>
+        <mass>70</mass>
+        <inertia>
+          <ixx>17.95</ixx><iyy>17.95</iyy><izz>2.19</izz>
+          <ixy>0</ixy><ixz>0</ixz><iyz>0</iyz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <geometry>
+          <cylinder><radius>0.25</radius><length>1.7</length></cylinder>
+        </geometry>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <cylinder><radius>0.25</radius><length>1.7</length></cylinder>
+        </geometry>
+        <material>
+          <ambient>1.0 0.45 0.0 1</ambient>
+          <diffuse>1.0 0.45 0.0 1</diffuse>
+        </material>
+      </visual>
+    </link>
+
+    <plugin filename="ignition-gazebo-velocity-control-system"
+            name="ignition::gazebo::systems::VelocityControl"/>
+  </model>
+</sdf>

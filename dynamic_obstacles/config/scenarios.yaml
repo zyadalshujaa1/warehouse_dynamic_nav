@@ -1,0 +1,41 @@
+# Moving-worker scenarios for the warehouse simulation (igin_sim.xml).
+#
+# Coordinates are in the map frame (equal to the Gazebo world frame here).
+# The robot's loaded leg runs from the pick-up shelf near (0, 0) to the
+# drop-off point (-5, 13): direction d = (-0.359, 0.933), length 13.9 m.
+#
+# Per worker:
+#   x, y            spawn position
+#   dir_x, dir_y    walking direction
+#   distance, speed one leg [m], walking speed [m/s]
+#   loop            true: back and forth forever, false: one pass then stop
+#   trigger_*       start walking when the robot is within trigger_radius of
+#                   (trigger_x, trigger_y); radius 0 = start immediately
+
+demo:
+  description: One worker walking back and forth (no trigger). Visual check only.
+  workers:
+    - {name: worker_1, x: -8.0, y: 5.0, dir_x: 1.0, dir_y: 0.0,
+       distance: 6.0, speed: 0.6, loop: true,
+       trigger_x: 0.0, trigger_y: 0.0, trigger_radius: 0.0}
+
+crossing:
+  description: A worker crosses the loaded leg at its midpoint (-2.5, 6.5), perpendicular to it.
+  workers:
+    - {name: worker_1, x: -6.23, y: 5.06, dir_x: 0.933, dir_y: 0.359,
+       distance: 8.0, speed: 0.6, loop: false,
+       trigger_x: -1.62, trigger_y: 4.20, trigger_radius: 0.7}
+
+head_on:
+  description: A worker walks down the loaded leg straight towards the robot.
+  workers:
+    - {name: worker_1, x: -3.23, y: 8.40, dir_x: 0.359, dir_y: -0.933,
+       distance: 6.0, speed: 0.6, loop: false,
+       trigger_x: -0.72, trigger_y: 1.87, trigger_radius: 0.7}
+
+overtaking:
+  description: A slow worker walks ahead of the robot in the same direction; the robot must pass it.
+  workers:
+    - {name: worker_1, x: -1.08, y: 2.80, dir_x: -0.359, dir_y: 0.933,
+       distance: 6.0, speed: 0.2, loop: false,
+       trigger_x: -0.36, trigger_y: 0.93, trigger_radius: 0.75}
