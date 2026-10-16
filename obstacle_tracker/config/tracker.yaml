@@ -1,0 +1,20 @@
+obstacle_tracker:
+  ros__parameters:
+    scan_topic: /scan
+    map_topic: /map
+    max_range: 8.0          # m
+    map_margin: 0.20        # m, points closer than this to a map wall are static
+    robot_half_length: 0.41 # robot footprint from the Nav2 config
+    robot_half_width: 0.31
+    robot_margin: 0.10      # m
+    cluster_gap: 0.20       # m
+    min_points: 3
+    max_width: 0.80         # m
+    centre_offset: 0.20     # m, from the synthetic test (test/test_core.py); to be checked in simulation
+    gate: 1.0               # m
+    accel_std: 1.0          # m/s^2
+    meas_std: 0.08          # m
+    init_pos_std: 0.3
+    init_vel_std: 1.0
+    confirm_hits: 3
+    max_missed_time: 1.0    # s
