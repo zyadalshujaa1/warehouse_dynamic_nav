@@ -48,7 +48,8 @@ def launch_scenario(context):
     for w in workers:
         params = {k: w[k] for k in ('dir_x', 'dir_y', 'distance', 'speed', 'loop',
                                     'trigger_x', 'trigger_y', 'trigger_radius')}
-        params.update({'use_sim_time': True, 'worker_name': w['name'], 'pause': 1.0})
+        params.update({'use_sim_time': True, 'worker_name': w['name'], 'pause': 1.0,
+                       'start_x': float(w['x']), 'start_y': float(w['y'])})
         actions.append(Node(
             package='dynamic_obstacles', executable='worker_mover', output='screen',
             name=f"{w['name']}_mover", parameters=[params]))

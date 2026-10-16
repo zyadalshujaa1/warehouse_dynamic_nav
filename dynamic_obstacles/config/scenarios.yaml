@@ -10,7 +10,15 @@
 #   distance, speed one leg [m], walking speed [m/s]
 #   loop            true: back and forth forever, false: one pass then stop
 #   trigger_*       start walking when the robot is within trigger_radius of
-#                   (trigger_x, trigger_y); radius 0 = start immediately
+#                   (trigger_x, trigger_y); radius 0 = start immediately.
+#                   Radii are wide on purpose: the planned path varies from
+#                   run to run, and a small radius can be missed entirely.
+#
+# Triggers (robot max speed 0.3 m/s):
+#   crossing   : robot within 2.2 m of the crossing point -> the worker needs
+#                ~6.7 s to reach it, the robot ~7 s.
+#   head_on    : robot within 7.0 m of the worker -> they meet mid-route.
+#   overtaking : robot within 2.0 m of the slow worker, behind it.
 
 demo:
   description: One worker walking back and forth (no trigger). Visual check only.
@@ -24,18 +32,18 @@ crossing:
   workers:
     - {name: worker_1, x: -6.23, y: 5.06, dir_x: 0.933, dir_y: 0.359,
        distance: 8.0, speed: 0.6, loop: false,
-       trigger_x: -1.62, trigger_y: 4.20, trigger_radius: 0.7}
+       trigger_x: -2.50, trigger_y: 6.50, trigger_radius: 2.2}
 
 head_on:
   description: A worker walks down the loaded leg straight towards the robot.
   workers:
     - {name: worker_1, x: -3.23, y: 8.40, dir_x: 0.359, dir_y: -0.933,
        distance: 6.0, speed: 0.6, loop: false,
-       trigger_x: -0.72, trigger_y: 1.87, trigger_radius: 0.7}
+       trigger_x: -3.23, trigger_y: 8.40, trigger_radius: 7.0}
 
 overtaking:
   description: A slow worker walks ahead of the robot in the same direction; the robot must pass it.
   workers:
     - {name: worker_1, x: -1.08, y: 2.80, dir_x: -0.359, dir_y: 0.933,
        distance: 6.0, speed: 0.2, loop: false,
-       trigger_x: -0.36, trigger_y: 0.93, trigger_radius: 0.75}
+       trigger_x: -1.08, trigger_y: 2.80, trigger_radius: 2.0}

@@ -6,7 +6,7 @@ package_name = 'dynamic_obstacles'
 
 setup(
     name=package_name,
-    version='0.2.0',
+    version='0.4.0',
     packages=[package_name],
     data_files=[
         ('share/ament_index/resource_index/packages', ['resource/' + package_name]),
@@ -24,6 +24,7 @@ setup(
     entry_points={
         'console_scripts': [
             'worker_mover = dynamic_obstacles.worker_mover:main',
+            'trial_runner = dynamic_obstacles.trial_runner:main',
         ],
     },
 )

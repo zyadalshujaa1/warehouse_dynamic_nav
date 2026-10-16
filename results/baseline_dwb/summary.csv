@@ -1,0 +1,16 @@
+scenario,method,run,outcome,mission_time_s,min_clearance_m,time_of_min_s,collisions,worker_moved
+crossing,dwb,1,collision,50.0,-0.009,50.0,1,True
+crossing,dwb,2,collision,46.8,-0.007,46.8,1,True
+crossing,dwb,3,collision,47.3,0.008,47.3,1,True
+crossing,dwb,4,collision,48.4,0.006,48.4,1,True
+crossing,dwb,5,collision,46.2,0.006,46.2,1,True
+head_on,dwb,1,succeeded,158.6,0.28,37.8,0,True
+head_on,dwb,2,succeeded,144.7,0.201,38.0,0,True
+head_on,dwb,3,succeeded,151.8,0.101,39.3,0,True
+head_on,dwb,4,succeeded,140.3,0.094,37.9,0,True
+head_on,dwb,5,succeeded,161.6,0.127,38.6,0,True
+overtaking,dwb,1,collision,75.7,0.018,75.7,1,True
+overtaking,dwb,2,collision,51.4,0.016,51.4,1,True
+overtaking,dwb,3,collision,57.0,0.019,57.0,1,True
+overtaking,dwb,4,succeeded,146.1,0.52,66.2,0,True
+overtaking,dwb,5,collision,51.8,0.017,51.8,1,True

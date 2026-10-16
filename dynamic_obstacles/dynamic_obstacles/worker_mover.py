@@ -20,7 +20,7 @@ import math
 import rclpy
 from rclpy.node import Node
 from rclpy.time import Time
-from geometry_msgs.msg import Twist
+from geometry_msgs.msg import PoseStamped, Twist
 from tf2_ros import Buffer, TransformListener, TransformException
 
 WAITING, WALKING, PAUSED, DONE = 'WAITING', 'WALKING', 'PAUSED', 'DONE'
@@ -33,6 +33,8 @@ class WorkerMover(Node):
 
         p = self.declare_parameter
         p('worker_name', 'worker_1')
+        p('start_x', 0.0)           # spawn position (map = world frame)
+        p('start_y', 0.0)
         p('dir_x', 1.0)
         p('dir_y', 0.0)
         p('speed', 0.6)            # m/s, typical walking pace
@@ -61,10 +63,19 @@ class WorkerMover(Node):
         self.tf_buffer = Buffer()
         self.tf_listener = TransformListener(self.tf_buffer, self)
         self.pub = self.create_publisher(Twist, f'/model/{self.name}/cmd_vel', 10)
+        # The worker floats without gravity or friction and VelocityControl
+        # enforces the commanded velocity, so integrating the commands gives
+        # its true position (also when it pushes into the robot).
+        self.pos = [g('start_x'), g('start_y')]
+        self.vel = (0.0, 0.0)
+        self.t_last = None
+        self.pose_pub = self.create_publisher(PoseStamped, f'/workers/{self.name}/pose', 10)
 
         self.state = WAITING if self.trigger_radius > 0 else WALKING
         self.sign = 1.0           # +1 forward leg, -1 return leg
         self.phase_start = None   # set once sim time is running
+        self.last_dist = None
+        self.last_report = 0.0
         self.timer = self.create_timer(0.05, self.tick)  # 20 Hz
 
         start = ('when robot is within %.2f m of (%.2f, %.2f)'
@@ -80,10 +91,25 @@ class WorkerMover(Node):
             t = self.tf_buffer.lookup_transform(
                 self.map_frame, self.robot_frame, Time())
         except TransformException:
-            return False  # localization not up yet
+            self.last_dist = None  # localization not up yet
+            return False
         dx = t.transform.translation.x - self.trigger[0]
         dy = t.transform.translation.y - self.trigger[1]
-        return math.hypot(dx, dy) <= self.trigger_radius
+        self.last_dist = math.hypot(dx, dy)
+        return self.last_dist <= self.trigger_radius
+
+    def report_waiting(self, now):
+        """Every 5 s of sim time, say how far the robot is from the trigger."""
+        if now - self.last_report < 5.0:
+            return
+        self.last_report = now
+        if self.last_dist is None:
+            self.get_logger().warn(
+                f'{self.name}: waiting, no TF {self.map_frame} -> {self.robot_frame} yet')
+        else:
+            self.get_logger().info(
+                f'{self.name}: waiting, robot is {self.last_dist:.2f} m from the trigger '
+                f'(starts at {self.trigger_radius:.2f} m)')
 
     def set_state(self, state, now):
         self.state, self.phase_start = state, now
@@ -97,19 +123,37 @@ class WorkerMover(Node):
             self.phase_start = now
 
         elapsed = now - self.phase_start
-        if self.state == WAITING and self.robot_near_trigger():
-            self.set_state(WALKING, now)
+        if self.state == WAITING:
+            if self.robot_near_trigger():
+                self.set_state(WALKING, now)
+            else:
+                self.report_waiting(now)
         elif self.state == WALKING and elapsed >= self.walk_time:
             self.set_state(PAUSED if self.loop else DONE, now)
         elif self.state == PAUSED and elapsed >= self.pause:
             self.sign = -self.sign
             self.set_state(WALKING, now)
 
+        # advance the position with the velocity commanded on the last tick
+        if self.t_last is not None:
+            dt = now - self.t_last
+            self.pos[0] += self.vel[0] * dt
+            self.pos[1] += self.vel[1] * dt
+        self.t_last = now
+
         cmd = Twist()  # zero velocity unless walking
         if self.state == WALKING:
             cmd.linear.x = self.sign * self.speed * self.dir[0]
             cmd.linear.y = self.sign * self.speed * self.dir[1]
+        self.vel = (cmd.linear.x, cmd.linear.y)
         self.pub.publish(cmd)
+
+        pose = PoseStamped()
+        pose.header.frame_id = self.map_frame
+        pose.header.stamp = self.get_clock().now().to_msg()
+        pose.pose.position.x, pose.pose.position.y = self.pos
+        pose.pose.orientation.w = 1.0
+        self.pose_pub.publish(pose)
 
 
 def main():
