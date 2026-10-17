@@ -8,6 +8,8 @@
 #
 # Another Nav2 parameter file (e.g. the MPPI baseline):
 #   NAV2_CONFIG=/path/to/nav2_mppi.yaml bash run_trials.sh mppi 5
+# Methods that need the obstacle tracker (MPPI + DynamicObstacleCritic):
+#   TRACKER=1 NAV2_CONFIG=/path/to/nav2_mppi_predictive.yaml bash run_trials.sh mppi_pred 5
 #
 # Results: ~/logistic_ws/results/summary.csv (one row per trial)
 # Logs:    ~/logistic_ws/results/logs/
@@ -25,13 +27,14 @@ if [ -n "$NAV2_CONFIG" ]; then
   NAV2_ARG=(nav2_config:="$NAV2_CONFIG")
   echo "Nav2 parameters: $NAV2_CONFIG"
 fi
+[ -n "$TRACKER" ] && echo "obstacle_tracker: ON"
 LOGS=~/logistic_ws/results/logs
 mkdir -p "$LOGS"
 
 cleanup() {
   pkill -INT -f "ros2 launch" 2>/dev/null
   sleep 5
-  PATTERN="ign gazebo|parameter_bridge|robot_state_publisher|worker_mover|trial_runner|nav2_|orgnizer|nav2_clint|getin_controller|controller_manager|controller_server|planner_server|bt_navigator|behavior_server|amcl|map_server|lifecycle_manager|velocity_smoother|waypoint_follower|smoother_server|spawner|ros2 launch"
+  PATTERN="ign gazebo|parameter_bridge|robot_state_publisher|worker_mover|trial_runner|nav2_|orgnizer|nav2_clint|getin_controller|controller_manager|controller_server|planner_server|bt_navigator|behavior_server|amcl|map_server|lifecycle_manager|velocity_smoother|waypoint_follower|smoother_server|spawner|obstacle_tracker|ros2 launch"
   pkill -f "$PATTERN" 2>/dev/null
   # wait until everything is gone; force-kill what is left after 15 s
   for i in $(seq 1 15); do
@@ -46,6 +49,9 @@ run_one() {   # scenario run tag
   cleanup
   ros2 launch robot_bringup igin_sim.xml "${NAV2_ARG[@]}" > "$LOGS/sim_$3.log" 2>&1 &
   sleep 40   # Gazebo + Nav2 start-up
+  if [ -n "$TRACKER" ]; then
+    ros2 launch obstacle_tracker tracker.launch.py > "$LOGS/tracker_$3.log" 2>&1 &
+  fi
   ros2 launch dynamic_obstacles workers.launch.py scenario:="$1" > "$LOGS/workers_$3.log" 2>&1 &
   sleep 5
   timeout 1200 ros2 run dynamic_obstacles trial_runner --ros-args \
