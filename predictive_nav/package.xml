@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>predictive_nav</name>
+  <version>0.1.0</version>
+  <description>Navigation with predicted motion of dynamic obstacles (MPPI configuration and critic)</description>
+  <maintainer email="zyadalshujaa@gmail.com">Zyad</maintainer>
+  <license>Apache-2.0</license>
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <exec_depend>nav2_mppi_controller</exec_depend>
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

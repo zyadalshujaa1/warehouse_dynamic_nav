@@ -21,6 +21,7 @@ robot's start pose so this can be checked.
 import csv
 import math
 import os
+import time
 
 import rclpy
 from rclpy.action import ActionClient
@@ -29,6 +30,7 @@ from rclpy.parameter import Parameter
 from rclpy.time import Time
 from action_msgs.msg import GoalStatus
 from geometry_msgs.msg import PoseStamped
+from std_srvs.srv import Trigger
 from tf2_ros import Buffer, TransformListener, TransformException
 
 from logistic_msg.action import MoveRobot
@@ -62,6 +64,7 @@ class TrialRunner(Node):
         p('stop_on_collision', True)  # end the trial at the first contact
         p('timeout', 600.0)           # s of simulation time
         p('settle', 5.0)              # s to wait after localization is up
+        p('startup_timeout', 240.0)   # s of wall time for Gazebo + Nav2 to come up
         p('results_dir', os.path.expanduser('~/logistic_ws/results'))
         p('map_frame', 'map')
         p('robot_frame', 'base_footprint')
@@ -72,6 +75,7 @@ class TrialRunner(Node):
         self.r_worker, self.hl, self.hw = g('worker_radius'), g('half_length'), g('half_width')
         self.contact_tol, self.timeout, self.settle = g('contact_tolerance'), g('timeout'), g('settle')
         self.stop_on_collision = g('stop_on_collision')
+        self.startup_timeout = g('startup_timeout')
         self.results_dir = os.path.expanduser(g('results_dir'))
         self.map_frame, self.robot_frame = g('map_frame'), g('robot_frame')
 
@@ -84,6 +88,15 @@ class TrialRunner(Node):
                                      lambda msg, w=w: self.on_worker(w, msg), 10)
 
         self.client = ActionClient(self, MoveRobot, 'cycle_perform')
+        # Nav2 lifecycle managers answer is_active=true once every Nav2 node is active.
+        # If start-up fails (seen under heavy CPU load) the robot never moves, which
+        # says nothing about navigation, so such a trial is marked 'startup_failed'.
+        self.nav2_check = {name: self.create_client(Trigger, f'/{name}/is_active')
+                           for name in ('lifecycle_manager_localization',
+                                        'lifecycle_manager_navigation')}
+        self.nav2_ok = {name: False for name in self.nav2_check}
+        self.nav2_pending = {}
+        self.wall_start = time.monotonic()
         self.phase = 'wait_server'
         self.t_phase = None
         self.t_goal = None
@@ -124,7 +137,7 @@ class TrialRunner(Node):
         pose = self.robot_pose()
 
         if self.phase == 'wait_server':
-            if self.client.server_is_ready() and pose is not None:
+            if self.client.server_is_ready() and pose is not None and all(self.nav2_ok.values()):
                 self.get_logger().info(
                     f'Robot start pose in map: x={pose[0]:.2f} y={pose[1]:.2f} '
                     f'yaw={pose[2]:.2f} (expected about -3.0, 0.0, 0.0)')
@@ -146,6 +159,30 @@ class TrialRunner(Node):
                     self.goal_handle.cancel_goal_async()
             if self.outcome is not None:
                 self.finish(now)
+
+    def poll_nav2(self):
+        """Called from the main loop (wall time): ask the lifecycle managers."""
+        for name, cli in self.nav2_check.items():
+            fut = self.nav2_pending.get(name)
+            if fut is not None and fut.done():
+                res = fut.result()
+                self.nav2_ok[name] = bool(res and res.success)
+                self.nav2_pending[name] = None
+            if not self.nav2_ok[name] and self.nav2_pending.get(name) is None \
+                    and cli.service_is_ready():
+                self.nav2_pending[name] = cli.call_async(Trigger.Request())
+
+    def check_startup(self):
+        """Called from the main loop (wall time, works even without /clock)."""
+        if self.done or self.phase not in ('wait_server', 'settle'):
+            return
+        if time.monotonic() - self.wall_start > self.startup_timeout:
+            self.get_logger().error(
+                f'Start-up failed: after {self.startup_timeout:.0f} s Nav2 active='
+                f'{self.nav2_ok}, mission server ready={self.client.server_is_ready()}')
+            self.outcome = 'startup_failed'
+            self.t_goal = self.now()
+            self.finish(self.t_goal)
 
     def send_goal(self, now):
         self.phase, self.t_goal = 'running', now
@@ -238,8 +275,13 @@ def main():
     rclpy.init()
     node = TrialRunner()
     try:
+        last_poll = 0.0
         while rclpy.ok() and not node.done:
             rclpy.spin_once(node, timeout_sec=0.1)
+            if time.monotonic() - last_poll > 2.0:
+                last_poll = time.monotonic()
+                node.poll_nav2()
+                node.check_startup()
     except KeyboardInterrupt:
         pass
     node.destroy_node()
