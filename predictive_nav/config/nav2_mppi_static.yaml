@@ -3,6 +3,9 @@
 # Generated from nav2_mppi.yaml (the MPPI baseline): identical except that
 # DynamicObstacleCritic is added to the MPPI critics. Needs obstacle_tracker
 # running (topic /tracked_obstacles). Critic values are first choices, not tuned:
+#   extension_time 3 s (v0.3): candidates are extended beyond the 2.8 s MPPI
+#     horizon so that stopping in a person's predicted path counts as a collision
+#     (v0.2 without it froze in the path: 7/15 contacts, see results);
 #   uncertainty_growth 0.15 m/s ~ measured growth of the prediction error
 #     (median 0.18 m at 1 s, 0.32 m at 2 s, 0.50 m at 3 s);
 #   circle_offsets/radius: two circles covering the 0.82 x 0.62 m footprint;
@@ -148,6 +151,8 @@ controller_server:
         max_track_age: 0.5
         max_obstacle_distance: 6.0
         near_goal_distance: 0.5
+        extension_time: 3.0
+        extension_dt: 0.1
     enable_stamped_cmd_vel: false
     use_sim_time: true
 local_costmap:

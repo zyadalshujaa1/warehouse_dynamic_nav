@@ -19,6 +19,8 @@ void DynamicObstacleCritic::initialize()
   getParam(params_.obstacle_radius, "obstacle_radius", 0.25);
   getParam(params_.circle_radius, "circle_radius", 0.375);
   getParam(params_.use_prediction, "use_prediction", true);
+  getParam(params_.extension_time, "extension_time", 3.0);
+  getParam(params_.extension_dt, "extension_dt", 0.1);
   getParam(max_track_age_, "max_track_age", 0.5);
   getParam(max_obstacle_distance_, "max_obstacle_distance", 6.0);
   getParam(near_goal_distance_, "near_goal_distance", 0.5);
@@ -35,10 +37,10 @@ void DynamicObstacleCritic::initialize()
 
   RCLCPP_INFO(
     logger_, "DynamicObstacleCritic: topic %s, prediction %s, weight %.1f, margin %.2f m "
-    "(+%.2f m/s), %zu body circles r=%.3f m",
+    "(+%.2f m/s), %zu body circles r=%.3f m, terminal extension %.1f s",
     topic_.c_str(), params_.use_prediction ? "ON" : "OFF (ablation)", params_.weight,
     params_.safety_margin, params_.uncertainty_growth, params_.circle_offsets.size(),
-    params_.circle_radius);
+    params_.circle_radius, params_.extension_time);
 }
 
 void DynamicObstacleCritic::onTrack(const nav_msgs::msg::Odometry::SharedPtr msg)

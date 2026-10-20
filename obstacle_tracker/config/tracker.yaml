@@ -17,4 +17,5 @@ obstacle_tracker:
     init_pos_std: 0.3
     init_vel_std: 1.0
     confirm_hits: 3
-    max_missed_time: 1.0    # s
+    max_missed_time: 2.0    # s, delete a track not seen for this long
+    coast_time: 1.5         # s, publish a lost track with its prediction (laser loses a person closer than ~1-1.5 m)

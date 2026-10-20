@@ -57,13 +57,17 @@ class TrackerNode(Node):
         p('init_pos_std', 0.3)
         p('init_vel_std', 1.0)
         p('confirm_hits', 3)         # publish a track after this many updates
-        p('max_missed_time', 1.0)    # s, delete a track not seen for this long
+        p('max_missed_time', 2.0)    # s, delete a track not seen for this long
+        p('coast_time', 1.5)         # s, keep publishing a lost track with its Kalman
+                                     # prediction (the laser loses a person closer than
+                                     # about 1-1.5 m, measured with tracker_eval)
 
         g = lambda n: self.get_parameter(n).value
         self.cfg = {n: g(n) for n in (
             'map_frame', 'robot_frame', 'max_range', 'map_margin',
             'robot_half_length', 'robot_half_width', 'robot_margin',
-            'cluster_gap', 'min_points', 'max_width', 'centre_offset', 'confirm_hits')}
+            'cluster_gap', 'min_points', 'max_width', 'centre_offset', 'confirm_hits',
+            'coast_time')}
         self.tracker = MultiTracker(g('gate'), g('accel_std'), g('meas_std'),
                                     g('init_pos_std'), g('init_vel_std'),
                                     g('max_missed_time'))
@@ -128,8 +132,10 @@ class TrackerNode(Node):
                                   c['max_width'], wrap=full_circle)
         dets = [cluster_centre(p, sensor[:2], c['centre_offset']) for p in clusters]
         tracks = self.tracker.step(t, dets)
+        # tracks updated by this scan, plus confirmed tracks that were lost less than
+        # coast_time ago (their state was predicted to time t by tracker.step)
         confirmed = [tr for tr in tracks
-                     if tr.hits >= c['confirm_hits'] and tr.last_seen == t]
+                     if tr.hits >= c['confirm_hits'] and t - tr.last_seen <= c['coast_time']]
         self.publish(scan.header.stamp, confirmed)
 
     # ---------------------------------------------------------- outputs
