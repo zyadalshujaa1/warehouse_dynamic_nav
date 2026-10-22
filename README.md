@@ -17,6 +17,12 @@
 
 <p align="center"><i>Tech Project Internship · ITMO University · M.Sc. Robotics and AI · Zyad Alshujaa</i></p>
 
+> **Contribution.** This work adds the dynamic-obstacle layer to an existing warehouse robot:
+> LiDAR tracking with motion prediction, a prediction-aware critic for the Nav2 MPPI planner,
+> and a repeatable evaluation pipeline. A 108-trial comparison against DWB and MPPI identifies
+> the *freezing-robot* failure of prediction-based avoidance, reduces it with a terminal
+> horizon extension, and shows where the problem remains open (crossing traffic).
+
 ---
 
 ## Demo
@@ -134,15 +140,22 @@ never yields:
 | Overtaking | 4/5 | 1/6 | 0/5 |
 | **All** | **9/15** | **11/27** | **11/24** |
 
+<p align="center"><img src="media/headon_example.png" width="95%" alt="Head-on scenario: trajectories and robot speed for MPPI, critic v1 and critic v2"></p>
+
+<p align="center"><img src="media/crossing_speed.png" width="85%" alt="Crossing scenario: robot speed before contact, MPPI vs critic v2"></p>
+
 Findings:
 - MPPI is safer than the default DWB planner (fewer contacts, 0.60 m vs 0.13 m head-on clearance).
 - A first critic version made the robot stop inside the worker's path — the known
   *freezing robot problem*; the terminal extension reduced it (head-on 3/5 → 1/5).
-- The critic does not yet improve on plain MPPI overall (Fisher p = 0.78); the crossing
-  scenario remains the open problem.
+- The critic does not yet improve on plain MPPI overall (Fisher p = 0.78). In crossing it
+  slows the robot in the last 3 s before contact (median 0.14 m/s vs 0.32 m/s for MPPI), but not
+  early enough to let the worker pass — the open problem.
 
 108 valid trials in total, including an ablation without prediction; full data and
-per-trial results in [`results/`](results/).
+per-trial results in [`results/`](results/). Figures are generated from the logged
+trajectories by `dynamic_obstacles/scripts/make_figures.py` (speed = per-step speed,
+0.5 s median against localisation jumps, 1 s mean).
 
 ## 6. Packages
 
