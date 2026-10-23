@@ -144,9 +144,13 @@ never yields:
 | Overtaking | 4/5 | 1/6 | 0/5 |
 | **All** | **9/15** | **11/27** | **11/24** |
 
-<p align="center"><img src="media/headon_example.png" width="95%" alt="Head-on scenario: trajectories and robot speed for MPPI, critic v1 and critic v2"></p>
+<p align="center"><img src="media/headon_example.png" width="90%" alt="Head-on scenario: paths and robot speed for MPPI, critic v1 and critic v2"></p>
 
-<p align="center"><img src="media/crossing_speed.png" width="85%" alt="Crossing scenario: robot speed before contact, MPPI vs critic v2"></p>
+<sub><b>Fig. 1.</b> Head-on scenario, one run per method: (a) MPPI, (b) MPPI + critic v1, (c) MPPI + critic v2. Solid line: robot path; dashed line: worker path; shapes: robot footprint and worker at the closest approach; &times;: contact. (d) Robot speed around the closest approach (t = 0).</sub>
+
+<p align="center"><img src="media/crossing_speed.png" width="62%" alt="Crossing scenario: robot speed before contact, MPPI vs critic v2"></p>
+
+<sub><b>Fig. 2.</b> Crossing scenario: robot speed during the 8 s before contact, over all contact trials with a saved trajectory (one MPPI log was overwritten by a repeated run). Lines: median; bands: interquartile range.</sub>
 
 Findings:
 - MPPI is safer than the default DWB planner (fewer contacts, 0.60 m vs 0.13 m head-on clearance).
