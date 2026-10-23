@@ -36,7 +36,7 @@ O VIDEO: on GitHub, edit this file and drag your .mp4 onto the empty line below.
 
 <p align="center"><i>Full mission in simulation: the robot docks under the shelf, lifts it and carries it
 while a worker walks into its path. One illustrative run, played at 2× speed.</i></p>
----
+
 
 ## Contents
 
