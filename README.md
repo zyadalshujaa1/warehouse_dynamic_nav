@@ -213,14 +213,6 @@ RUN=src/warehouse_dynamic_nav/dynamic_obstacles/scripts/run_trials.sh
 TRACKER=1 NAV2_CONFIG=$CFG/nav2_mppi_predictive.yaml bash $RUN mppi_pred2 5
 ```
 
-## 8. Status and next steps
-
-| Working | Next |
-|---|---|
-| Full autonomous mission in simulation | Cost on time spent in a person's predicted path, to stop *before* a crossing |
-| Worker tracking and prediction from LiDAR | Reactive pedestrian model (e.g. social force) for realistic tests |
-| Prediction-aware MPPI critic | Tuning of critic weights on separate runs |
-| Repeatable experiment pipeline | Docking from large shelf misalignment |
 
 
 **References.** Bar-Shalom, Li, Kirubarajan, *Estimation with Applications to Tracking and
