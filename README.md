@@ -17,11 +17,17 @@
 
 <p align="center"><i>Tech Project Internship · ITMO University · M.Sc. Robotics and AI · Zyad Alshujaa</i></p>
 
-> **Contribution.** This work adds the dynamic-obstacle layer to an existing warehouse robot:
-> LiDAR tracking with motion prediction, a prediction-aware critic for the Nav2 MPPI planner,
-> and a repeatable evaluation pipeline. A 108-trial comparison against DWB and MPPI identifies
-> the *freezing-robot* failure of prediction-based avoidance, reduces it with a terminal
-> horizon extension, and shows where the problem remains open (crossing traffic).
+> **Contribution.** This work adds a dynamic-obstacle layer to an existing warehouse logistics
+> robot and integrates it with the robot's platform, which was adapted to run the complete
+> docking–lifting–delivery mission reproducibly in simulation. The layer consists of LiDAR
+> tracking of workers with constant-velocity prediction (median position error 12.7 cm;
+> about 3× more accurate than assuming a standing worker), a prediction-aware critic for the
+> Nav2 MPPI planner, and a repeatable evaluation pipeline. In 108 trials, a first version of the
+> critic reproduced the known *freezing-robot problem*; a terminal horizon extension reduced it
+> in head-on encounters (3/5 → 1/5 contacts). The final critic performs on par with plain MPPI
+> overall (11/24 vs 11/27 contacts) and avoids all contacts in overtaking; the remaining
+> failures concentrate in crossing traffic, where the robot slows down but too late — pointing
+> to the next step: penalising time spent in the person's predicted path.
 
 ---
 
