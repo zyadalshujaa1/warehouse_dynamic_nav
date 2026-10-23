@@ -222,12 +222,6 @@ TRACKER=1 NAV2_CONFIG=$CFG/nav2_mppi_predictive.yaml bash $RUN mppi_pred2 5
 | Prediction-aware MPPI critic | Tuning of critic weights on separate runs |
 | Repeatable experiment pipeline | Docking from large shelf misalignment |
 
-## 9. Credits
-
-<!-- ZYAD: write this section yourself: the original project, its author, link and
-     permission. -->
-
-_To be written._
 
 **References.** Bar-Shalom, Li, Kirubarajan, *Estimation with Applications to Tracking and
 Navigation*, Wiley 2001 · Trautman, Krause, "Unfreezing the robot", IROS 2010 · Nav2
