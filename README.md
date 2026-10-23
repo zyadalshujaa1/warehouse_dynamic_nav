@@ -53,8 +53,7 @@ while a worker walks into its path. One illustrative run, played at 2× speed.</
 5. [Evaluation](#5-evaluation)
 6. [Packages](#6-packages)
 7. [Build and run](#7-build-and-run)
-8. [Status and next steps](#8-status-and-next-steps)
-9. [Credits](#9-credits)
+
 
 ---
 
