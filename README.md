@@ -15,7 +15,7 @@
   <img alt="Python" src="https://img.shields.io/badge/Python-tracking%20%26%20experiments-3776AB?style=flat-square">
 </p>
 
-<p align="center"><i> · ITMO University · M.Sc. Robotics and AI · Zyad Alshujaa</i></p>
+<p align="center">· ITMO University · M.Sc. Robotics and AI · Zyad Alshujaa</i></p>
 
 > **Contribution.** This work adds a dynamic-obstacle layer to an existing warehouse logistics
 > robot and integrates it with the robot's platform, which was adapted to run the complete
